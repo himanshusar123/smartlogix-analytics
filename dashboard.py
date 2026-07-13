@@ -115,9 +115,10 @@ shipments_df = read_db_table("shipments")
 
 # Extract KPI values
 total_shipments = int(kpis_df.loc[0, 'total_shipments']) if not kpis_df.empty else 0
-total_revenue = float(kpis_df.loc[0, 'total_revenue']) if not kpis_df.empty else 0.0
-avg_weight = float(kpis_df.loc[0, 'avg_weight']) if not kpis_df.empty else 0.0
+total_revenue = float(kpis_df.loc[0, 'total_revenue']) if not kpis_df.empty and kpis_df.loc[0, 'total_revenue'] is not None else 0.0
+avg_weight = float(kpis_df.loc[0, 'avg_weight']) if not kpis_df.empty and kpis_df.loc[0, 'avg_weight'] is not None else 0.0
 unique_vehicles = int(vehicle_df.loc[0, 'unique_vehicles']) if not vehicle_df.empty else 0
+
 
 # 1. Top KPI Row
 col1, col2, col3, col4 = st.columns(4)
