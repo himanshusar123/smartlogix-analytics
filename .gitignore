@@ -1,0 +1,11 @@
+# Ignore dynamic portable packages
+jdk/
+hadoop/
+
+# Ignore local database and caches
+smartlogix.db
+__pycache__/
+test_query.py
+.ipynb_checkpoints/
+*.zip
+*.log
