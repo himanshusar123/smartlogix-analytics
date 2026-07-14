@@ -38,6 +38,12 @@ def create_topic_if_not_exists(bootstrap_servers, topic_name):
         admin_client.close()
 
 def run_producer():
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--duration", type=int, default=None, help="Run duration in seconds")
+    args, unknown = parser.parse_known_args()
+    duration = args.duration
+
     bootstrap_servers = 'localhost:9092'
     topic_name = 'shipment-events'
     
@@ -65,8 +71,12 @@ def run_producer():
     active_shipments = []
     
     print("Generating events...")
+    start_time = time.time()
     try:
         while True:
+            if duration and (time.time() - start_time) > duration:
+                print(f"Duration limit of {duration}s reached. Exiting producer...")
+                break
             # Randomly decide whether to create a new shipment or progress an existing one
             if not active_shipments or random.random() < 0.3:
                 shipment_id_counter += 1

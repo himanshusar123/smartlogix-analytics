@@ -2,6 +2,12 @@ import os
 import sys
 import sqlite3
 import threading
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--timeout", type=int, default=None, help="Streaming timeout in seconds")
+args, unknown = parser.parse_known_args()
+timeout = args.timeout
 
 # Dynamic JAVA_HOME setup for portable JDK
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -226,6 +232,23 @@ print("All Spark Streaming queries started. Listening for Kafka events...")
 
 # Await termination
 try:
-    spark.streams.awaitAnyTermination()
+    if timeout:
+        import time
+        print(f"Awaiting streaming termination with timeout of {timeout} seconds...")
+        start_time = time.time()
+        while (time.time() - start_time) < timeout:
+            active_streams = spark.streams.active
+            if not active_streams:
+                break
+            time.sleep(1)
+        print("Timeout reached or no active streams. Stopping all streams...")
+        for stream in spark.streams.active:
+            try:
+                stream.stop()
+            except Exception as e:
+                print(f"Error stopping stream: {e}")
+    else:
+        spark.streams.awaitAnyTermination()
 except KeyboardInterrupt:
     print("Stopping Spark Streaming application...")
+
