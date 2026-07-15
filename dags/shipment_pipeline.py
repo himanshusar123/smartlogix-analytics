@@ -24,7 +24,7 @@ dag = DAG(
     'smartlogix_logistics_pipeline',
     default_args=default_args,
     description='SmartLogix Automated Logistics Data Pipeline',
-    schedule_interval='@daily',
+    schedule_interval='0 9 * * *',
     catchup=False,
 )
 
@@ -76,5 +76,24 @@ launch_dashboard = PythonOperator(
     dag=dag,
 )
 
+# Task 5: Notify Operations Team
+# Simulates notifying the operations team that the daily pipeline run was successful
+def notify_ops_status():
+    print("--------------------------------------------------")
+    print("NOTIFICATION SENT TO OPERATIONS TEAM!")
+    print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("Status: Success")
+    print("Message: Day 10 Automated Logistics Pipeline has completed successfully.")
+    print("Database (smartlogix.db) is updated and verified.")
+    print("Live Streamlit dashboard is active and running.")
+    print("--------------------------------------------------")
+
+notify_operations = PythonOperator(
+    task_id='notify_operations',
+    python_callable=notify_ops_status,
+    dag=dag,
+)
+
 # Task dependencies
-start_producer >> run_spark_streaming >> verify_sqlite >> launch_dashboard
+start_producer >> run_spark_streaming >> verify_sqlite >> launch_dashboard >> notify_operations
+
